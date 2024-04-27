@@ -10,7 +10,7 @@
                 </div>
             </div>
             <div id="y-dice-control-container" class="dice marg">
-                <Dice :default="modeData" ref="dice" @rollDice="rollDice"></Dice>
+                <Dice :default="modeData" ref="dice" @rollDice="rollDice(1)" @rollDice2="rollDice(2)"></Dice>
             </div>
         </div>
 
@@ -84,11 +84,18 @@ export default{
                 percent: false,
                 modeData: Mode.NONE,
                 numberOfRollsTotal: 0,
+                numberOfRollsTotal2: 0,
                 chartHorizontal: true,
                 chart: null,
                 marginLeft: '52px',
                 diceDataTotal: [0, 0, 0, 0],
+                diceDataTotal2: [0, 0, 0, 0],
                 diceResults: [
+                    { text: 'Stand', ameise: 0, frosch: 0, schnecke: 0, igel: 0 },
+                    { text: 'absolut', ameise: 0, frosch: 0, schnecke: 0, igel: 0 },
+                    { text: 'prozentual', ameise: 0, frosch: 0, schnecke: 0, igel: 0 }
+                ],
+                diceResults2: [
                     { text: 'Stand', ameise: 0, frosch: 0, schnecke: 0, igel: 0 },
                     { text: 'absolut', ameise: 0, frosch: 0, schnecke: 0, igel: 0 },
                     { text: 'prozentual', ameise: 0, frosch: 0, schnecke: 0, igel: 0 }
@@ -108,6 +115,18 @@ export default{
                         categoryPercentage: 1.0,
                         barPercentage: 1.0
                     },
+                    {
+                        labels: ['rot', 'grün', 'gelb', 'blau'],
+                        backgroundColor: ['rgba(235, 50, 36, 1)', 'rgba(117, 249, 78, 1)', 'rgba(254, 253, 86, 1)', 'rgba(58, 105, 245, 1)'],
+                        borderColor: ['rgb(0, 0, 0)', 'rgb(0, 0, 0)', 'rgb(0,0,0)', 'rgb(0, 0, 0)'],
+                        borderWidth: 1,
+                        data: [0, 0, 0, 0],
+                        percent: [0, 0, 0, 0],
+                        rolls: [0, 0, 0, 0],
+                        images: [rotBild, gruenBild, gelbBild, blauBild],
+                        categoryPercentage: 1.0,
+                        barPercentage: 1.0
+                    }
                     ]     
                },
                 chartOptions: {
@@ -182,7 +201,11 @@ export default{
                 this.total = false;
                 this.percent = false;
                 this.diceResults = [{ text: 'Stand', ameise: 0, frosch: 0, schnecke: 0, igel: 0 }];
+                this.diceResults2 = [{ text: 'Stand', ameise: 0, frosch: 0, schnecke: 0, igel: 0 }];
+
                 this.diceDataTotal = [0, 0, 0, 0];
+                this.diceDataTotal2 = [0, 0, 0, 0];
+
                 
                 this.myChart.options.scales.y.max = 100;
                 this.myChart.options.scales.y.min = 0;
@@ -207,8 +230,14 @@ export default{
                 this.percent = false;
                 this.diceResults = [{ text: 'Stand', ameise: 0, frosch: 0, schnecke: 0, igel: 0 },
                                     { text: 'absolut', ameise: 0, frosch: 0, schnecke: 0, igel: 0 }];
+                this.diceResults2 = [{ text: 'Stand', ameise: 0, frosch: 0, schnecke: 0, igel: 0 },
+                                    { text: 'absolut', ameise: 0, frosch: 0, schnecke: 0, igel: 0 }];
+
                 this.numberOfRollsTotal = 0;
+                this.numberOfRollsTotal2 = 0;
+
                 this.diceDataTotal = [0, 0, 0, 0];
+                this.diceDataTotal2 = [0, 0, 0, 0];
 
 
                 this.myChart.options.scales.y.max = 100;
@@ -235,8 +264,16 @@ export default{
                 this.diceResults = [{ text: 'Stand', ameise: 0, frosch: 0, schnecke: 0, igel: 0 },
                                     { text: 'absolut', ameise: 0, frosch: 0, schnecke: 0, igel: 0 },
                                     { text: 'prozentual', ameise: 0, frosch: 0, schnecke: 0, igel: 0 }];
+                this.diceResults2 = [{ text: 'Stand', ameise: 0, frosch: 0, schnecke: 0, igel: 0 },
+                                    { text: 'absolut', ameise: 0, frosch: 0, schnecke: 0, igel: 0 },
+                                    { text: 'prozentual', ameise: 0, frosch: 0, schnecke: 0, igel: 0 }];
+
                 this.numberOfRollsTotal = 0;
+                this.numberOfRollsTotal2 = 0;
+
                 this.diceDataTotal = [0, 0, 0, 0];
+                this.diceDataTotal2 = [0, 0, 0, 0];
+
 
 
                 this.myChart.options.scales.y.max = 100;
@@ -263,11 +300,12 @@ export default{
             setTableToZero() {
                 
                 this.myChart.data.datasets[0].data = [0, 0, 0, 0];
+                this.myChart.data.datasets[1].data = [0, 0, 0, 0];
                 this.myChart.stop();
                 this.myChart.update();
         
             },
-            displayChart(rolls, numberOfRolls) {
+            displayChart(rolls, numberOfRolls, würfel) {
 
                 if(this.easy) {
                     this.myChart.options.animation.duration = 0;
@@ -282,31 +320,65 @@ export default{
                 {rank: 4, label: 'Blau', value: ((rolls.filter(roll => roll === 'blue').length) / numberOfRolls) * 100, rolls: (rolls.filter(roll => roll === 'blue').length), sides: 3},
                 ]
             
-                if (this.percent){
-                    var newData = [((this.diceResults[1].ameise/ this.numberOfRollsTotal) * 100).toFixed(), ((this.diceResults[1].frosch/ this.numberOfRollsTotal) * 100).toFixed(), ((this.diceResults[1].schnecke/ this.numberOfRollsTotal) * 100).toFixed(), ((this.diceResults[1].igel/ this.numberOfRollsTotal) * 100).toFixed()];
-                } 
-                else if (this.easy) {
-                    var newData = allData.map(data => data.rolls);
-                }
-                else {
-                    var newData = [this.diceResults[1].ameise, this.diceResults[1].frosch, this.diceResults[1].schnecke, this.diceResults[1].igel];
-                }
+                if(würfel == 1) {
+                    if (this.percent){
+                        var newData = [((this.diceResults[1].ameise/ this.numberOfRollsTotal) * 100).toFixed(), ((this.diceResults[1].frosch/ this.numberOfRollsTotal) * 100).toFixed(), ((this.diceResults[1].schnecke/ this.numberOfRollsTotal) * 100).toFixed(), ((this.diceResults[1].igel/ this.numberOfRollsTotal) * 100).toFixed()];
+                    } 
+                    else if (this.easy) {
+                        var newData = allData.map(data => data.rolls);
+                    }
+                    else {
+                        var newData = [this.diceResults[1].ameise, this.diceResults[1].frosch, this.diceResults[1].schnecke, this.diceResults[1].igel];
+                    }
 
-                var newRolls = allData.map(data => data.rolls);
+                    var newRolls = allData.map(data => data.rolls);
 
-                this.myChart.data.datasets[0].rolls = newRolls;
-                this.myChart.data.datasets[0].data = newData;
-                this.myChart.data.datasets[0].percent = allData.map(data => data.value);
+                    this.myChart.data.datasets[0].rolls = newRolls;
+                    this.myChart.data.datasets[0].data = newData;
+                    this.myChart.data.datasets[0].percent = allData.map(data => data.value);
+
+                }
+                if(würfel == 2) {
+                    if (this.percent){
+                        var newData = [((this.diceResults2[1].ameise/ this.numberOfRollsTotal2) * 100).toFixed(), ((this.diceResults2[1].frosch/ this.numberOfRollsTotal2) * 100).toFixed(), ((this.diceResults2[1].schnecke/ this.numberOfRollsTotal2) * 100).toFixed(), ((this.diceResults2[1].igel/ this.numberOfRollsTotal2) * 100).toFixed()];
+                    } 
+                    else if (this.easy) {
+                        var newData = allData.map(data => data.rolls);
+                    }
+                    else {
+                        var newData = [this.diceResults2[1].ameise, this.diceResults2[1].frosch, this.diceResults2[1].schnecke, this.diceResults2[1].igel];
+                    }
+
+                    var newRolls = allData.map(data => data.rolls);
+
+                    this.myChart.data.datasets[1].rolls = newRolls;
+                    this.myChart.data.datasets[1].data = newData;
+                    this.myChart.data.datasets[1].percent = allData.map(data => data.value);
+
+                }
+                
+                let dice = this.$refs.dice;
 
                 if (this.easy) {
-                    this.fixLables(numberOfRolls);
-                    this.fixCallback(numberOfRolls);
+                    if(dice.numberOfRolls < dice.numberOfRolls2) {
+                        this.fixLables(dice.numberOfRolls2);
+                        this.fixCallback(dice.numberOfRolls2);
+                    }
+                    else {
+                        this.fixLables(dice.numberOfRolls);
+                        this.fixCallback(dice.numberOfRolls);
+                    }
 
                 }
                 if (this.total) {
-                    this.fixLables(this.numberOfRollsTotal);
-                    this.fixCallback(this.numberOfRollsTotal);
-
+                    if(dice.numberOfRollsTotal < dice.numberOfRollsTotal2) {
+                        this.fixLables(dice.numberOfRollsTotal2);
+                        this.fixCallback(dice.numberOfRollsTotal2);
+                    }
+                    else {
+                        this.fixLables(dice.numberOfRollsTotal);
+                        this.fixCallback(dice.numberOfRollsTotal);
+                    }
                 }
                 if (this.percent) {
                     this.myChart.options.scales.y.ticks.callback = function(value, index, ticks) {
@@ -314,43 +386,78 @@ export default{
                     }  
                     this.myChart.options.scales.y.ticks.stepSize = undefined;
                 }
-                
                 this.myChart.update();
               
             },
-            rollDice() {
+            rollDice(dicenumber) {
                 let dice = this.$refs.dice;
 
-                if (dice.warningRolls || dice.warningSites) {
-                    
-                    this.displayChart([], 0);
-                    return;
+                if(dicenumber == 1){
+                    if (dice.warningRolls || dice.warningSites) {
+                        
+                        this.displayChart([], 0, 1);
+                        return;
+                    }
+
+                
+                    this.numberOfRollsTotal = this.numberOfRollsTotal + dice.numberOfRolls;
+
+                    this.diceResults[0].ameise = (dice.rolls.filter(roll => roll === 'red').length);
+                    this.diceResults[0].frosch = (dice.rolls.filter(roll => roll === 'green').length);
+                    this.diceResults[0].schnecke = (dice.rolls.filter(roll => roll === 'yellow').length);
+                    this.diceResults[0].igel = (dice.rolls.filter(roll => roll === 'blue').length);
+
+                    if (this.total || this.percent) {
+                        this.diceResults[1].ameise =  this.diceResults[1].ameise + (dice.rolls.filter(roll => roll === 'red').length);
+                        this.diceResults[1].frosch = this.diceResults[1].frosch + (dice.rolls.filter(roll => roll === 'green').length);
+                        this.diceResults[1].schnecke = this.diceResults[1].schnecke + (dice.rolls.filter(roll => roll === 'yellow').length);
+                        this.diceResults[1].igel = this.diceResults[1].igel  + (dice.rolls.filter(roll => roll === 'blue').length);
+                    }
+
+                    if (this.percent) {
+                        this.diceResults[2].ameise =  ((this.diceResults[1].ameise / this.numberOfRollsTotal) * 100).toFixed(2).replace('.', ',') + "%";
+                        this.diceResults[2].frosch = ((this.diceResults[1].frosch / this.numberOfRollsTotal) * 100).toFixed(2).replace('.', ',') + "%";
+                        this.diceResults[2].schnecke = ((this.diceResults[1].schnecke/ this.numberOfRollsTotal) * 100).toFixed(2).replace('.', ',') + "%";
+                        this.diceResults[2].igel = ((this.diceResults[1].igel/ this.numberOfRollsTotal) * 100).toFixed(2).replace('.', ',') + "%";
+                    }
+
+
+                    this.displayChart(dice.rolls, dice.numberOfRolls, 1);
                 }
+                if(dicenumber == 2){
+                    console.log("rollDice in if");
+                    if (dice.warningRolls2 || dice.warningSites2) {
+                        console.log("rollDice warningrolls");
 
-            
-                this.numberOfRollsTotal = this.numberOfRollsTotal + dice.numberOfRolls;
+                        this.displayChart([], 0, 2);
+                        return;
+                    }
 
-                this.diceResults[0].ameise = (dice.rolls.filter(roll => roll === 'red').length);
-                this.diceResults[0].frosch = (dice.rolls.filter(roll => roll === 'green').length);
-                this.diceResults[0].schnecke = (dice.rolls.filter(roll => roll === 'yellow').length);
-                this.diceResults[0].igel = (dice.rolls.filter(roll => roll === 'blue').length);
+                
+                    this.numberOfRollsTotal2 = this.numberOfRollsTotal2 + dice.numberOfRolls2;
 
-                if (this.total || this.percent) {
-                    this.diceResults[1].ameise =  this.diceResults[1].ameise + (dice.rolls.filter(roll => roll === 'red').length);
-                    this.diceResults[1].frosch = this.diceResults[1].frosch + (dice.rolls.filter(roll => roll === 'green').length);
-                    this.diceResults[1].schnecke = this.diceResults[1].schnecke + (dice.rolls.filter(roll => roll === 'yellow').length);
-                    this.diceResults[1].igel = this.diceResults[1].igel  + (dice.rolls.filter(roll => roll === 'blue').length);
+                    this.diceResults2[0].ameise = (dice.rolls.filter(roll => roll === 'red').length);
+                    this.diceResults2[0].frosch = (dice.rolls.filter(roll => roll === 'green').length);
+                    this.diceResults2[0].schnecke = (dice.rolls.filter(roll => roll === 'yellow').length);
+                    this.diceResults2[0].igel = (dice.rolls.filter(roll => roll === 'blue').length);
+
+                    if (this.total || this.percent) {
+                        this.diceResults2[1].ameise =  this.diceResults2[1].ameise + (dice.rolls.filter(roll => roll === 'red').length);
+                        this.diceResults2[1].frosch = this.diceResults2[1].frosch + (dice.rolls.filter(roll => roll === 'green').length);
+                        this.diceResults2[1].schnecke = this.diceResults2[1].schnecke + (dice.rolls.filter(roll => roll === 'yellow').length);
+                        this.diceResults2[1].igel = this.diceResults2[1].igel  + (dice.rolls.filter(roll => roll === 'blue').length);
+                    }
+
+                    if (this.percent) {
+                        this.diceResults2[2].ameise =  ((this.diceResults2[1].ameise / this.numberOfRollsTotal2) * 100).toFixed(2).replace('.', ',') + "%";
+                        this.diceResults2[2].frosch = ((this.diceResults2[1].frosch / this.numberOfRollsTotal2) * 100).toFixed(2).replace('.', ',') + "%";
+                        this.diceResults2[2].schnecke = ((this.diceResults2[1].schnecke/ this.numberOfRollsTotal2) * 100).toFixed(2).replace('.', ',') + "%";
+                        this.diceResults2[2].igel = ((this.diceResults2[1].igel/ this.numberOfRollsTotal2) * 100).toFixed(2).replace('.', ',') + "%";
+                    }
+
+
+                    this.displayChart(dice.rolls2, dice.numberOfRolls2, 2);
                 }
-
-                if (this.percent) {
-                    this.diceResults[2].ameise =  ((this.diceResults[1].ameise / this.numberOfRollsTotal) * 100).toFixed(2).replace('.', ',') + "%";
-                    this.diceResults[2].frosch = ((this.diceResults[1].frosch / this.numberOfRollsTotal) * 100).toFixed(2).replace('.', ',') + "%";
-                    this.diceResults[2].schnecke = ((this.diceResults[1].schnecke/ this.numberOfRollsTotal) * 100).toFixed(2).replace('.', ',') + "%";
-                    this.diceResults[2].igel = ((this.diceResults[1].igel/ this.numberOfRollsTotal) * 100).toFixed(2).replace('.', ',') + "%";
-                }
-
-
-                this.displayChart(dice.rolls, dice.numberOfRolls);
             },
             resetTable() {
                 this.diceResults[0].ameise =  0;
@@ -371,9 +478,29 @@ export default{
                     this.diceResults[2].schnecke = 0;
                     this.diceResults[2].igel = 0;
                 }
+                this.diceResults2[0].ameise =  0;
+                this.diceResults2[0].frosch = 0;
+                this.diceResults2[0].schnecke = 0;
+                this.diceResults2[0].igel = 0;
 
+                if (this.total || this.percent) {
+                    this.diceResults2[1].ameise =  0;
+                    this.diceResults2[1].frosch = 0;
+                    this.diceResults2[1].schnecke = 0;
+                    this.diceResults2[1].igel = 0;
+                }
+
+                if (this.percent) {
+                    this.diceResults2[2].ameise =  0;
+                    this.diceResults2[2].frosch = 0;
+                    this.diceResults2[2].schnecke = 0;
+                    this.diceResults2[2].igel = 0;
+                }
                 this.numberOfRollsTotal = 0;
                 this.diceDataTotal = [0, 0, 0, 0];
+
+                this.numberOfRollsTotal2 = 0;
+                this.diceDataTotal2 = [0, 0, 0, 0];
 
                 this.$refs.dice.setTotalRollsZero();
                 this.setTableToZero();
@@ -603,20 +730,6 @@ export default{
 
                 else {
                     this.myChart.options.scales.y.ticks.stepSize = undefined;
-                }
-            },
-            fixMargin(number){
-                console.log("margin start");
-
-                if (number < 100) {
-                    this.marginLeft = "50px";
-                    console.log(this.marginLeft + "1");
-                } else if (number < 10000) {
-                    this.marginLeft = "35px";
-                    console.log(this.marginLeft + "2");
-                } else if (number < 10000000) {
-                    this.marginLeft = "30px";
-                    console.log(this.marginLeft + "3");
                 }
             },
             fixCallback(number) {
