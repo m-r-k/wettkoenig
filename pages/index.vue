@@ -297,10 +297,9 @@ export default{
                 this.myChart.update();
 
             },
-            setTableToZero() {
+            setTableToZero(number) {
                 
-                this.myChart.data.datasets[0].data = [0, 0, 0, 0];
-                this.myChart.data.datasets[1].data = [0, 0, 0, 0];
+                this.myChart.data.datasets[number - 1].data = [0, 0, 0, 0];
                 this.myChart.stop();
                 this.myChart.update();
         
@@ -309,7 +308,7 @@ export default{
 
                 if(this.easy) {
                     this.myChart.options.animation.duration = 0;
-                    this.setTableToZero();
+                    this.setTableToZero(würfel);
                     this.myChart.options.animation.duration = 1500;
                 }
 
@@ -325,7 +324,8 @@ export default{
                         var newData = [((this.diceResults[1].ameise/ this.numberOfRollsTotal) * 100).toFixed(), ((this.diceResults[1].frosch/ this.numberOfRollsTotal) * 100).toFixed(), ((this.diceResults[1].schnecke/ this.numberOfRollsTotal) * 100).toFixed(), ((this.diceResults[1].igel/ this.numberOfRollsTotal) * 100).toFixed()];
                     } 
                     else if (this.easy) {
-                        var newData = allData.map(data => data.rolls);
+                        var newData = [this.diceResults[0].ameise, this.diceResults[0].frosch, this.diceResults[0].schnecke, this.diceResults[0].igel];
+
                     }
                     else {
                         var newData = [this.diceResults[1].ameise, this.diceResults[1].frosch, this.diceResults[1].schnecke, this.diceResults[1].igel];
@@ -343,7 +343,8 @@ export default{
                         var newData = [((this.diceResults2[1].ameise/ this.numberOfRollsTotal2) * 100).toFixed(), ((this.diceResults2[1].frosch/ this.numberOfRollsTotal2) * 100).toFixed(), ((this.diceResults2[1].schnecke/ this.numberOfRollsTotal2) * 100).toFixed(), ((this.diceResults2[1].igel/ this.numberOfRollsTotal2) * 100).toFixed()];
                     } 
                     else if (this.easy) {
-                        var newData = allData.map(data => data.rolls);
+                        var newData = [this.diceResults2[0].ameise, this.diceResults2[0].frosch, this.diceResults2[0].schnecke, this.diceResults2[0].igel];
+
                     }
                     else {
                         var newData = [this.diceResults2[1].ameise, this.diceResults2[1].frosch, this.diceResults2[1].schnecke, this.diceResults2[1].igel];
@@ -394,7 +395,6 @@ export default{
 
                 if(dicenumber == 1){
                     if (dice.warningRolls || dice.warningSites) {
-                        
                         this.displayChart([], 0, 1);
                         return;
                     }
@@ -425,9 +425,7 @@ export default{
                     this.displayChart(dice.rolls, dice.numberOfRolls, 1);
                 }
                 if(dicenumber == 2){
-                    console.log("rollDice in if");
                     if (dice.warningRolls2 || dice.warningSites2) {
-                        console.log("rollDice warningrolls");
 
                         this.displayChart([], 0, 2);
                         return;
@@ -436,16 +434,16 @@ export default{
                 
                     this.numberOfRollsTotal2 = this.numberOfRollsTotal2 + dice.numberOfRolls2;
 
-                    this.diceResults2[0].ameise = (dice.rolls.filter(roll => roll === 'red').length);
-                    this.diceResults2[0].frosch = (dice.rolls.filter(roll => roll === 'green').length);
-                    this.diceResults2[0].schnecke = (dice.rolls.filter(roll => roll === 'yellow').length);
-                    this.diceResults2[0].igel = (dice.rolls.filter(roll => roll === 'blue').length);
+                    this.diceResults2[0].ameise = (dice.rolls2.filter(roll => roll === 'red').length);
+                    this.diceResults2[0].frosch = (dice.rolls2.filter(roll => roll === 'green').length);
+                    this.diceResults2[0].schnecke = (dice.rolls2.filter(roll => roll === 'yellow').length);
+                    this.diceResults2[0].igel = (dice.rolls2.filter(roll => roll === 'blue').length);
 
                     if (this.total || this.percent) {
-                        this.diceResults2[1].ameise =  this.diceResults2[1].ameise + (dice.rolls.filter(roll => roll === 'red').length);
-                        this.diceResults2[1].frosch = this.diceResults2[1].frosch + (dice.rolls.filter(roll => roll === 'green').length);
-                        this.diceResults2[1].schnecke = this.diceResults2[1].schnecke + (dice.rolls.filter(roll => roll === 'yellow').length);
-                        this.diceResults2[1].igel = this.diceResults2[1].igel  + (dice.rolls.filter(roll => roll === 'blue').length);
+                        this.diceResults2[1].ameise =  this.diceResults2[1].ameise + (dice.rolls2.filter(roll => roll === 'red').length);
+                        this.diceResults2[1].frosch = this.diceResults2[1].frosch + (dice.rolls2.filter(roll => roll === 'green').length);
+                        this.diceResults2[1].schnecke = this.diceResults2[1].schnecke + (dice.rolls2.filter(roll => roll === 'yellow').length);
+                        this.diceResults2[1].igel = this.diceResults2[1].igel  + (dice.rolls2.filter(roll => roll === 'blue').length);
                     }
 
                     if (this.percent) {
@@ -503,7 +501,9 @@ export default{
                 this.diceDataTotal2 = [0, 0, 0, 0];
 
                 this.$refs.dice.setTotalRollsZero();
-                this.setTableToZero();
+                this.setTableToZero(1);
+                this.setTableToZero(2);
+
 
                 if (this.total) {
                     this.myChart.options.scales.y.ticks.stepSize = 10;

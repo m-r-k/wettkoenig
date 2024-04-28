@@ -75,6 +75,7 @@
                 this.percent = false;
                 this.numberOfRolls = 0;
                 this.warningRollsMax = false;
+                this.warningRollsMax2 = false;
             } 
             if(newVal == Mode.TOTAL) {
                 this.total = true;
@@ -82,6 +83,7 @@
                 this.percent = false;
                 this.numberOfRolls = 0;
                 this.warningRollsMax = false;
+                this.warningRollsMax2 = false;
             } 
             if(newVal == Mode.PERCENT) {
                 this.percent = true;
@@ -89,6 +91,7 @@
                 this.total = false;
                 this.numberOfRolls = 0;
                 this.warningRollsMax = false;
+                this.warningRollsMax2 = false;
             } 
         }
     },
@@ -121,14 +124,14 @@
     },
     methods: {
         diceRolled(number) {
-            const rolls = [];
+            const roll = [];
             if(number == 1) {
                 if (this.numberOfRolls == 0) {
                     this.warningRollsLow = true;
                 }
 
                 if (this.warningRollsLow || this.warningRollsHigh) {
-                    this.rolls = rolls;
+                    this.rolls = roll;
                     return;
                 }
 
@@ -147,7 +150,7 @@
                 }
 
                 if (this.warningRollsLow2 || this.warningRollsHigh2) {
-                    this.rolls2 = rolls;
+                    this.rolls2 = roll;
                     return;
                 }
 
@@ -169,16 +172,17 @@
                 for (let i = 0; i < this.numberOfRolls; i++) {
                     const randomRoll = Math.floor(Math.random() * this.totalSides) + 1
                     if (randomRoll <= rangeRed) {
-                        rolls.push('red')
+                        roll.push('red');
                     } else if (randomRoll <= rangeGreen) {
-                        rolls.push('green')
+                        roll.push('green');
                     } else if (randomRoll <= rangeYellow){
-                        rolls.push('yellow')
+                        roll.push('yellow');
                     } else if (randomRoll <= rangeBlue) {
-                        rolls.push('blue')
+                        roll.push('blue');
                     }
                 }
-                this.rolls = rolls
+
+                this.rolls = roll;
 
                 this.numberOfRollsTotal = this.numberOfRolls + this.numberOfRollsTotal;
             
@@ -186,18 +190,19 @@
             }
             if(number == 2){
                 for (let i = 0; i < this.numberOfRolls2; i++) {
-                    const randomRoll = Math.floor(Math.random() * this.totalSides2) + 1
+
+                    const randomRoll = Math.floor(Math.random() * this.totalSides) + 1
                     if (randomRoll <= rangeRed) {
-                        rolls.push('red')
+                        roll.push('red');
                     } else if (randomRoll <= rangeGreen) {
-                        rolls.push('green')
+                        roll.push('green');
                     } else if (randomRoll <= rangeYellow){
-                        rolls.push('yellow')
+                        roll.push('yellow');
                     } else if (randomRoll <= rangeBlue) {
-                        rolls.push('blue')
+                        roll.push('blue');
                     }
                 }
-                this.rolls2 = rolls
+                this.rolls2 = roll;
 
                 this.numberOfRollsTotal2 = this.numberOfRolls2 + this.numberOfRollsTotal2;
             
