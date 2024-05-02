@@ -113,7 +113,8 @@ html,body, #__nuxt, #__layout{
   align-items: center;
   margin-left: auto;
   margin-right: auto;
-  height: 200px;
+  height: 320px;
+  flex-direction: column;
 }
 
 .row-descriptions {
@@ -168,7 +169,6 @@ html,body, #__nuxt, #__layout{
   max-width: 658px;
   min-width: 658px;
   margin-top: 10px;
-  margin-bottom: auto;
 }
 
 .table-head-img {
@@ -218,7 +218,7 @@ html,body, #__nuxt, #__layout{
 }
 
 .th-fixed-w {
-  width: 156px;
+  width: 182px;
 }
 
 .table-rows {
@@ -244,3 +244,4 @@ html,body, #__nuxt, #__layout{
 .marg-top {
   margin-top: 20px;
 }
+

@@ -1,6 +1,11 @@
 <template>
     <div class="flex flex-col">
-
+        <div class="buttons-container flex flex-row rounded-md px-4 p-4 m-0 mt-2 ml-4 mr-2">
+                    <button class="button-top" :class="[backgroundColor, this.tenDice ? 'button-on' : '',]" @click="clickTenDice">10er Würfel</button>
+                    <button class="button-top" :class="[backgroundColor, this.twentyDice ? 'button-on' : '',]" @click="clickTwentyDice">20er Würfel</button>
+                    <button class="button-top" :class="[backgroundColor, this.bothDice ? 'button-on' : '',]" @click="clickBothDice">Beide Würfel</button>
+                    <button class="button-top" :class="[backgroundColor, this.ownDice ? 'button-on' : '',]" @click="clickOwnDice">Eigener Würfel</button>
+                </div>
         <div class="flex flex-col items-start">
             <label for="num-rolls" class="text-lg font-medium">Anzahl der Würfe:</label>
             <input v-on:keyup.enter="diceRolled(1)" type="number" id="num-rolls" class="border-gray-300 border rounded-md px-3 py-2 w-full" min="1" max="1000000" v-bind:keyup=enforceMinMax() v-model="numberOfRolls" @input="removeLeadingZeros">
@@ -20,21 +25,18 @@
         <div v-if="this.total||this.percent" ref="container" class="space-y-2 lableContainer marg-top">
             <label>Auf dem Würfel sind:</label>
             <div>
-                <label class="text-lg font-medium redInput w-full block">{{ 7 }} rote Seiten</label>
+                <label class="text-lg font-medium redInput w-full block">{{ 5 }} rote Seiten</label>
             </div>
             <div>
-                <label class="text-lg font-medium greenInput w-full block">{{ 5 }} grüne Seiten</label>
+                <label class="text-lg font-medium yellowInput w-full block">{{ 3 }} gelbe Seiten</label>
             </div>
             <div>
-                <label class="text-lg font-medium yellowInput w-full block">{{ 5 }} gelbe Seiten</label>
-            </div>
-            <div>
-                <label class="text-lg font-medium blueInput w-full block">{{ 3 }} blaue Seiten</label>
+                <label class="text-lg font-medium blueInput w-full block">{{ 2 }} blaue Seiten</label>
             </div>
         </div>
 
 
-        <div class="flex flex-col items-start">
+        <div v-if="this.bothDice" class="flex flex-col items-start">
             <label for="num-rolls" class="text-lg font-medium">Anzahl der Würfe:</label>
             <input v-on:keyup.enter="diceRolled(2)" type="number" id="num-rolls" class="border-gray-300 border rounded-md px-3 py-2 w-full" min="1" max="1000000" v-bind:keyup=enforceMinMax2() v-model="numberOfRolls2" @input="removeLeadingZeros">
             <label v-if="warningRollsLow2" class="text-red-700">Du musst mindestens 1 eingeben.</label>
@@ -42,11 +44,11 @@
             <label v-if="warningRollsMax2" class="text-red-700">Die maximale Anzahl der Würfe insgesamt ist 1.000.000.</label>
         </div>
 
-        <div class="flex flex-col">
+        <div v-if="this.bothDice" class="flex flex-col">
             <button type="button" @click="diceRolled(2)" class="button text-white rounded-md px-4 py-2 mt-4 mb-2">Würfeln</button>
         </div>
 
-        <div class="total-rolls-container marg-top" v-if="this.total||this.percent">
+        <div class="total-rolls-container marg-top" v-if="(this.total||this.percent) & this.bothDice">
             <lable>Anzahl der Würfe insgesamt: {{this.numberOfRollsTotal2}}</lable>
         </div>
     </div>
@@ -98,6 +100,10 @@
 
     data() {
         return {
+        tenDice: true,
+        twentyDice: false,
+        bothDice: false,
+        ownDice: false,
         easy: false,
         total: false,
         percent: false,
@@ -105,7 +111,7 @@
         numberOfRolls2: '',
         numberOfRollsTotal: '',
         numberOfRollsTotal2: '',
-        totalSides: 20,
+        totalSides: 10,
         rolls: [],
         rolls2: [],
         warningRollsHigh: false,
@@ -115,14 +121,62 @@
         warningRollsLow2: false,
         warningRollsMax2: false,
         diceSidesInfo:  [
-            {rank: 0, color:'red', text: 'Rote Seiten: ', classColor: 'redInput' , sides: 7},
-            {rank: 1, color:'green', text: 'Grüne Seiten: ', classColor: 'greenInput' , sides: 5},
-            {rank: 2, color:'yellow', text: 'Gelbe Seiten: ', classColor: 'yellowInput' , sides: 5},
-            {rank: 3, color:'blue', text: 'Blaue Seiten: ', classColor: 'blueInput' , sides: 3},
+            {rank: 0, color:'red', text: 'Rote Seiten: ', classColor: 'redInput' , sides: 5},
+            {rank: 1, color:'yellow', text: 'Gelbe Seiten: ', classColor: 'yellowInput' , sides: 3},
+            {rank: 2, color:'blue', text: 'Blaue Seiten: ', classColor: 'blueInput' , sides: 2},
         ],
         }
     },
     methods: {
+        clickTenDice(){
+            this.tenDice = true,
+            this.twentyDice = false;
+            this.bothDice = false;
+            this.ownDice = false;
+
+            this.numberOfRolls = 0;
+            this.warningRollsMax = false;
+            this.warningRollsMax2 = false;
+
+            this.$emit('changeDiceTen');
+
+        },
+        clickTwentyDice(){
+            this.tenDice = false,
+            this.twentyDice = true;
+            this.bothDice = false;
+            this.ownDice = false;
+
+            this.numberOfRolls = 0;
+            this.warningRollsMax = false;
+            this.warningRollsMax2 = false;
+            this.$emit('changeDiceTwenty');
+
+        },
+        clickBothDice(){
+            this.tenDice = false,
+            this.twentyDice = false;
+            this.bothDice = true;
+            this.ownDice = false;
+
+            this.numberOfRolls = 0;
+            this.warningRollsMax = false;
+            this.warningRollsMax2 = false;
+            this.$emit('changeDiceBoth');
+
+        },
+        clickOwnDice(){
+            this.tenDice = false,
+            this.twentyDice = false;
+            this.bothDice = false;
+            this.ownDice = true;
+
+            this.numberOfRolls = 0;
+            this.warningRollsMax = false;
+            this.warningRollsMax2 = false;
+            this.$emit('changeDiceOwn');
+
+        },
         diceRolled(number) {
             const roll = [];
             if(number == 1) {
@@ -163,18 +217,15 @@
                 }
             }  
 
-            let rangeRed = 7;
-            let rangeGreen = 12;
-            let rangeYellow = 17;
-            let rangeBlue = 20;
+            let rangeRed = 5;
+            let rangeYellow = 8;
+            let rangeBlue = 10;
 
             if(number == 1){
                 for (let i = 0; i < this.numberOfRolls; i++) {
                     const randomRoll = Math.floor(Math.random() * this.totalSides) + 1
                     if (randomRoll <= rangeRed) {
                         roll.push('red');
-                    } else if (randomRoll <= rangeGreen) {
-                        roll.push('green');
                     } else if (randomRoll <= rangeYellow){
                         roll.push('yellow');
                     } else if (randomRoll <= rangeBlue) {
@@ -194,8 +245,6 @@
                     const randomRoll = Math.floor(Math.random() * this.totalSides) + 1
                     if (randomRoll <= rangeRed) {
                         roll.push('red');
-                    } else if (randomRoll <= rangeGreen) {
-                        roll.push('green');
                     } else if (randomRoll <= rangeYellow){
                         roll.push('yellow');
                     } else if (randomRoll <= rangeBlue) {
